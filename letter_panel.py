@@ -28,19 +28,17 @@ import os
 #  Paths & Constants
 # ═══════════════════════════════════════════════════════════════════════
 
-PANELS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "panels", "ch0")
-FONTS_DIR = r"C:\Windows\Fonts"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PANELS_DIR = os.path.join(BASE_DIR, "panels", "ch0")
+PROJECT_FONTS = os.path.join(BASE_DIR, "fonts")
+SYSTEM_FONTS = r"C:\Windows\Fonts"
 
-# System font paths (replace with recommended fonts when available):
-#   Text/Dialogue → Bangers-Regular.ttf (Google Fonts) or AnimeAce2.0.ttf
-#   SFX           → Bangers or Impact
-#   System UI     → VT323-Regular.ttf or ShareTechMono-Regular.ttf
-#   Monologue     → Italic variant of your text font
-FONT_TEXT = os.path.join(FONTS_DIR, "arialbd.ttf")
-FONT_SFX = os.path.join(FONTS_DIR, "impact.ttf")
-FONT_SYSTEM = os.path.join(FONTS_DIR, "consola.ttf")
-FONT_ITALIC = os.path.join(FONTS_DIR, "ariali.ttf")
-FONT_REGULAR = os.path.join(FONTS_DIR, "arial.ttf")
+FONT_BANGERS = os.path.join(PROJECT_FONTS, "Bangers-Regular.ttf")
+FONT_TEXT = FONT_BANGERS
+FONT_SFX = os.path.join(SYSTEM_FONTS, "impact.ttf")
+FONT_SYSTEM = os.path.join(SYSTEM_FONTS, "consola.ttf")
+FONT_ITALIC = os.path.join(SYSTEM_FONTS, "ariali.ttf")
+FONT_REGULAR = os.path.join(SYSTEM_FONTS, "arial.ttf")
 
 TARGET_W = 1080
 TARGET_H = 1920
@@ -172,18 +170,21 @@ def _text_block_size(lines, font):
 def render_text_panel(config):
     """Generate a text-only panel: white bg, centered black text.
 
-    Lines can be plain strings (scale=1.0) or tuples (text, scale).
-    Empty strings create paragraph breaks.
-    Optical centering shifts the block slightly below mathematical center
-    so it looks visually centered on a tall 9:16 canvas.
+    Each line in "lines" can be:
+      - A plain string             → uses base_size, default margin
+      - ("text", scale)            → uses base_size * scale, default margin
+      - {"t": "text", "px": 90, "mb": 80}  → exact pixel size + margin_bottom
+      - ""                         → paragraph break (uses para_gap)
+
+    Supports "letter_spacing" in the text_block element (pixels, default 0).
+    The entire text block is vertically centered on the canvas.
     """
     img = Image.new("RGB", (TARGET_W, TARGET_H), (255, 255, 255))
     draw = ImageDraw.Draw(img)
 
     base_size = int(TARGET_W * 0.037)
-    line_spacing = 2.0
+    default_line_height = 2.0
     para_gap = int(base_size * 3.0)
-    optical_offset = int(TARGET_H * 0.04)
 
     text_block = None
     for elem in config.get("elements", []):
@@ -195,40 +196,86 @@ def render_text_panel(config):
         return img.convert("RGBA")
 
     raw_lines = text_block["lines"]
+    letter_spacing = text_block.get("letter_spacing", 0)
 
     render_items = []
     total_h = 0
 
     for entry in raw_lines:
-        if isinstance(entry, tuple):
+        if isinstance(entry, dict):
+            text = entry["t"]
+            fsize = entry.get("px", base_size)
+            mb = entry.get("mb", 0)
+            color = tuple(entry["color"]) if "color" in entry else None
+            font = _font(text_block.get("font", FONT_TEXT), fsize)
+            text_h = _text_size(text, font)[1]
+            item_h = text_h + mb
+            render_items.append({
+                "kind": "text", "text": text, "font": font,
+                "text_h": text_h, "h": item_h, "color": color
+            })
+            total_h += item_h
+        elif isinstance(entry, tuple):
             text, scale = entry
-        else:
-            text, scale = entry, 1.0
-
-        if not text:
+            if not text:
+                render_items.append({"kind": "break", "h": para_gap})
+                total_h += para_gap
+            else:
+                fsize = max(18, int(base_size * scale))
+                font = _font(text_block.get("font", FONT_TEXT), fsize)
+                lh = int(fsize * default_line_height)
+                render_items.append({
+                    "kind": "text", "text": text, "font": font,
+                    "text_h": int(fsize * 1.0), "h": lh
+                })
+                total_h += lh
+        elif entry == "":
             render_items.append({"kind": "break", "h": para_gap})
             total_h += para_gap
         else:
-            fsize = max(18, int(base_size * scale))
-            font = _font(FONT_TEXT, fsize)
-            lh = int(fsize * line_spacing)
+            text = entry
+            fsize = base_size
+            font = _font(text_block.get("font", FONT_TEXT), fsize)
+            lh = int(fsize * default_line_height)
             render_items.append({
-                "kind": "text", "text": text, "font": font, "h": lh
+                "kind": "text", "text": text, "font": font,
+                "text_h": int(fsize * 1.0), "h": lh
             })
             total_h += lh
 
-    y = (TARGET_H - total_h) // 2 + optical_offset
+    y = (TARGET_H - total_h) // 2
 
     for item in render_items:
         if item["kind"] == "break":
             y += item["h"]
         else:
-            tw, _ = _text_size(item["text"], item["font"])
-            x = (TARGET_W - tw) // 2
-            draw.text((x, y), item["text"], fill=BLACK_TEXT, font=item["font"])
+            fill = item.get("color") or BLACK_TEXT
+            if letter_spacing > 0:
+                _draw_spaced_text(draw, item["text"], item["font"],
+                                  y, letter_spacing, fill)
+            else:
+                tw, _ = _text_size(item["text"], item["font"])
+                x = (TARGET_W - tw) // 2
+                draw.text((x, y), item["text"], fill=fill, font=item["font"])
             y += item["h"]
 
     return img.convert("RGBA")
+
+
+def _draw_spaced_text(draw, text, font, y, spacing, fill):
+    """Draw text centered with extra letter spacing (pixels between chars)."""
+    total_w = 0
+    char_widths = []
+    for ch in text:
+        cw, _ = _text_size(ch, font)
+        char_widths.append(cw)
+        total_w += cw
+    total_w += spacing * max(0, len(text) - 1)
+
+    x = (TARGET_W - total_w) // 2
+    for i, ch in enumerate(text):
+        draw.text((x, y), ch, fill=fill, font=font)
+        x += char_widths[i] + spacing
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -240,7 +287,7 @@ def render_title_card(config):
     draw = ImageDraw.Draw(img)
 
     base_size = int(TARGET_W * 0.037)
-    line_spacing = 1.8
+    default_line_height = 1.8
     para_gap = int(base_size * 2.5)
 
     card_elem = None
@@ -257,20 +304,40 @@ def render_title_card(config):
     total_h = 0
 
     for entry in raw_lines:
-        if isinstance(entry, tuple):
+        if isinstance(entry, dict):
+            text = entry["t"]
+            fsize = entry.get("px", base_size)
+            mb = entry.get("mb", 0)
+            font = _font(FONT_TEXT, fsize)
+            text_h = _text_size(text, font)[1]
+            item_h = text_h + mb
+            render_items.append({
+                "kind": "text", "text": text, "font": font,
+                "text_h": text_h, "h": item_h
+            })
+            total_h += item_h
+        elif isinstance(entry, tuple):
             text, scale = entry
-        else:
-            text, scale = entry, 1.0
-
-        if not text:
+            if not text:
+                render_items.append({"kind": "break", "h": para_gap})
+                total_h += para_gap
+            else:
+                fsize = max(18, int(base_size * scale))
+                font = _font(FONT_TEXT, fsize)
+                lh = int(fsize * default_line_height)
+                render_items.append({
+                    "kind": "text", "text": text, "font": font, "h": lh
+                })
+                total_h += lh
+        elif entry == "":
             render_items.append({"kind": "break", "h": para_gap})
             total_h += para_gap
         else:
-            fsize = max(18, int(base_size * scale))
+            fsize = base_size
             font = _font(FONT_TEXT, fsize)
-            lh = int(fsize * line_spacing)
+            lh = int(fsize * default_line_height)
             render_items.append({
-                "kind": "text", "text": text, "font": font, "h": lh
+                "kind": "text", "text": entry, "font": font, "h": lh
             })
             total_h += lh
 
@@ -459,44 +526,118 @@ def render_monologue(draw, elem, fonts, w, h):
 # ═══════════════════════════════════════════════════════════════════════
 
 def render_system(draw, elem, fonts, w, h):
-    font = fonts["system"]
-    title_font = fonts["system_title"]
-    error_font = fonts["system_error"]
+    """Render a system stat screen. Supports two formats:
+
+    Legacy: elem["lines"] is a list of plain strings.
+    Precise: elem["lines"] is a list of dicts with keys:
+        {"t": text, "px": font_size, "color": [r,g,b]}
+        {"gap": pixels}                      — vertical spacing
+        {"parts": [{t, px, color}, ...]}     — mixed formatting on one line
+    """
     lines = elem["lines"]
-    box_w = int(w * elem.get("width", 0.78))
-    pad = int(w * 0.025)
-    brd = max(2, int(w * 0.003))
 
-    px = int(elem["pos"][0] * w)
-    py = int(elem["pos"][1] * h)
+    is_precise = any(isinstance(ln, dict) for ln in lines)
 
-    lh = int(font.size * 1.5)
-    total_h = lh * len(lines) + pad * 2
-    bx = px - box_w // 2
-    by = py
+    if is_precise:
+        box_w = elem.get("box_w", int(w * 0.83))
+        box_h_spec = elem.get("box_h", None)
+        pad = elem.get("padding", int(w * 0.025))
+        brd = elem.get("border_width", 2)
+        border_color = tuple(elem.get("border_color", list(COLD_WHITE))) + (255,)
+        default_lh = elem.get("line_height", 80)
 
-    draw.rectangle([bx, by, bx + box_w, by + total_h],
-                   fill=(*SYSTEM_BG, 230),
-                   outline=(*COLD_WHITE, 180), width=brd)
+        content_h = 0
+        for ln in lines:
+            if isinstance(ln, dict):
+                if "gap" in ln:
+                    content_h += ln["gap"]
+                else:
+                    content_h += default_lh
+            else:
+                content_h += default_lh
 
-    accent = int(w * 0.03)
-    for cx, cy in [(bx, by), (bx + box_w, by),
-                   (bx, by + total_h), (bx + box_w, by + total_h)]:
-        dx = 1 if cx == bx else -1
-        dy = 1 if cy == by else -1
-        draw.line([(cx, cy), (cx + accent * dx, cy)],
-                  fill=(*COLD_WHITE, 255), width=2)
-        draw.line([(cx, cy), (cx, cy + accent * dy)],
-                  fill=(*COLD_WHITE, 255), width=2)
+        box_h = box_h_spec if box_h_spec else content_h + pad * 2
+        bx = (w - box_w) // 2
+        by = (h - box_h) // 2
 
-    ty = by + pad
-    for i, line in enumerate(lines):
-        is_title = (i == 0)
-        has_error = "ERROR" in line or "???" in line or "UNREADABLE" in line
-        f = title_font if is_title else (error_font if has_error else font)
-        color = (*PURPLE, 255) if has_error else (*COLD_WHITE, 255)
-        draw.text((bx + pad, ty), line, font=f, fill=color)
-        ty += lh
+        draw.rectangle([bx, by, bx + box_w, by + box_h],
+                       fill=(*SYSTEM_BG, 230),
+                       outline=border_color, width=brd)
+
+        accent = int(w * 0.03)
+        for cx, cy in [(bx, by), (bx + box_w, by),
+                       (bx, by + box_h), (bx + box_w, by + box_h)]:
+            dx = 1 if cx == bx else -1
+            dy = 1 if cy == by else -1
+            draw.line([(cx, cy), (cx + accent * dx, cy)],
+                      fill=(*COLD_WHITE, 255), width=2)
+            draw.line([(cx, cy), (cx, cy + accent * dy)],
+                      fill=(*COLD_WHITE, 255), width=2)
+
+        ty = by + pad
+        for ln in lines:
+            if not isinstance(ln, dict):
+                font = fonts["system"]
+                draw.text((bx + pad, ty), ln, font=font,
+                          fill=(*COLD_WHITE, 255))
+                ty += default_lh
+            elif "gap" in ln:
+                ty += ln["gap"]
+            elif "parts" in ln:
+                tx = bx + pad
+                for part in ln["parts"]:
+                    fsize = part.get("px", 44)
+                    color = tuple(part.get("color", list(COLD_WHITE)))
+                    f = _font(FONT_SYSTEM, fsize)
+                    draw.text((tx, ty), part["t"], font=f, fill=color)
+                    pw, _ = _text_size(part["t"], f)
+                    tx += pw
+                ty += default_lh
+            else:
+                fsize = ln.get("px", 44)
+                color = tuple(ln.get("color", list(COLD_WHITE)))
+                f = _font(FONT_SYSTEM, fsize)
+                draw.text((bx + pad, ty), ln["t"], font=f, fill=color)
+                ty += default_lh
+
+    else:
+        font = fonts["system"]
+        title_font = fonts["system_title"]
+        error_font = fonts["system_error"]
+        box_w = int(w * elem.get("width", 0.78))
+        pad = int(w * 0.025)
+        brd_w = max(2, int(w * 0.003))
+
+        px = int(elem["pos"][0] * w)
+        py = int(elem["pos"][1] * h)
+
+        lh = int(font.size * 1.5)
+        total_h = lh * len(lines) + pad * 2
+        bx = px - box_w // 2
+        by = py
+
+        draw.rectangle([bx, by, bx + box_w, by + total_h],
+                       fill=(*SYSTEM_BG, 230),
+                       outline=(*COLD_WHITE, 180), width=brd_w)
+
+        accent = int(w * 0.03)
+        for cx, cy in [(bx, by), (bx + box_w, by),
+                       (bx, by + total_h), (bx + box_w, by + total_h)]:
+            dx = 1 if cx == bx else -1
+            dy = 1 if cy == by else -1
+            draw.line([(cx, cy), (cx + accent * dx, cy)],
+                      fill=(*COLD_WHITE, 255), width=2)
+            draw.line([(cx, cy), (cx, cy + accent * dy)],
+                      fill=(*COLD_WHITE, 255), width=2)
+
+        ty = by + pad
+        for i, line in enumerate(lines):
+            is_title = (i == 0)
+            has_error = "ERROR" in line or "???" in line or "UNREADABLE" in line
+            f = title_font if is_title else (error_font if has_error else font)
+            color = (*PURPLE, 255) if has_error else (*COLD_WHITE, 255)
+            draw.text((bx + pad, ty), line, font=f, fill=color)
+            ty += lh
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -572,14 +713,12 @@ PANELS = {
         "base": "text",
         "elements": [{
             "type": "text_block",
+            "letter_spacing": 0,
             "lines": [
-                "My name is Hollow Zounds.",
-                "",
-                "Yeah. That's a real-ass name, nigga.",
-                "I looked that shit up.",
-                "It's a whole thing.",
-                "",
-                ("Anyway.", 1.5),
+                {"t": "My name is Hollow Zounds.", "px": 90, "mb": 80},
+                {"t": "Yeah. That's a real-ass name, nigga.", "px": 68, "mb": 10},
+                {"t": "I looked that shit up. It's a whole thing.", "px": 68, "mb": 100},
+                {"t": "Anyway.", "px": 160, "mb": 0},
             ],
         }],
     },
@@ -597,15 +736,14 @@ PANELS = {
         "elements": [{
             "type": "text_block",
             "lines": [
-                "I'm 18. Just graduated.",
-                "I live with my grandma.",
-                "I do sword shit. Self-taught.",
-                "My sensei quit after three months",
-                "'cause my form was actual dog ass.",
-                "",
-                ("I kept going.", 1.2),
-                "Sensei made the right call honestly.",
-                ("That nigga was scared.", 1.15),
+                {"t": "I'm 18. Just graduated.", "px": 72, "mb": 8},
+                {"t": "I live with my grandma.", "px": 72, "mb": 8},
+                {"t": "I do sword shit. Self-taught.", "px": 72, "mb": 60},
+                {"t": "My sensei quit after three months", "px": 72, "mb": 8},
+                {"t": "'cause my form was actual dog ass.", "px": 72, "mb": 120},
+                {"t": "I kept going.", "px": 130, "mb": 16},
+                {"t": "Sensei made the right call honestly.", "px": 72, "mb": 8},
+                {"t": "That nigga was scared.", "px": 110, "mb": 0},
             ],
         }],
     },
@@ -623,12 +761,11 @@ PANELS = {
         "elements": [{
             "type": "text_block",
             "lines": [
-                "I'm also a programmer.",
-                "Built my own hunter stat tracker app.",
-                "",
-                "It's advanced as fuck.",
-                "You probably wouldn't understand",
-                ("the UI, dumbass.", 1.15),
+                {"t": "I'm also a programmer.", "px": 72, "mb": 10},
+                {"t": "Built my own hunter stat tracker app.", "px": 58, "mb": 100},
+                {"t": "It's advanced as fuck.", "px": 80, "mb": 12},
+                {"t": "You probably wouldn't understand", "px": 56, "mb": 10},
+                {"t": "the UI, dumbass.", "px": 85, "mb": 0},
             ],
         }],
     },
@@ -646,17 +783,15 @@ PANELS = {
         "elements": [{
             "type": "text_block",
             "lines": [
-                "Oh right. The luck stat.",
-                "",
-                "So here's the thing.",
-                "After the incident \u2014",
-                "which I'll get to \u2014",
-                "the system gave me a stat screen.",
-                "",
-                "Every other stat came back normal.",
-                "Luck just said ERROR,",
-                ("that dumb bitch.", 1.2),
-                "Still does.",
+                {"t": "Oh right. The luck stat.", "px": 100, "mb": 80},
+                {"t": "So here's the thing.", "px": 72, "mb": 8},
+                {"t": "After the incident --", "px": 72, "mb": 8},
+                {"t": "which I'll get to --", "px": 72, "mb": 8},
+                {"t": "the system gave me a stat screen.", "px": 72, "mb": 80},
+                {"t": "Every other stat came back normal.", "px": 72, "mb": 8},
+                {"t": "Luck just said ERROR,", "px": 72, "mb": 8},
+                {"t": "that dumb bitch.", "px": 140, "mb": 24},
+                {"t": "still does.", "px": 52, "mb": 0, "color": [85, 85, 85]},
             ],
         }],
     },
@@ -666,20 +801,27 @@ PANELS = {
         "base": "dark",
         "elements": [{
             "type": "system",
-            "pos": (0.50, 0.18),
-            "width": 0.82,
+            "box_w": 920,
+            "padding": 48,
+            "border_color": [68, 68, 170],
+            "border_width": 2,
+            "line_height": 80,
             "lines": [
-                "HOLLOW ZOUNDS",
-                "RANK: E",
-                "",
-                "STRENGTH     \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591  F",
-                "AGILITY      \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591  F",
-                "ENDURANCE    \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591  F",
-                "INTELLIGENCE \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591  D",
-                "LUCK         ??????????  ERROR",
-                "",
-                "WARNING: STAT UNREADABLE",
-                "RECOMMENDATION: DO NOT ALLOCATE",
+                {"t": "HOLLOW ZOUNDS", "px": 64, "color": [200, 224, 255]},
+                {"t": "RANK: E", "px": 48, "color": [200, 224, 255]},
+                {"gap": 40},
+                {"t": "STRENGTH      \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591   F", "px": 44, "color": [200, 224, 255]},
+                {"t": "AGILITY       \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591   F", "px": 44, "color": [200, 224, 255]},
+                {"t": "ENDURANCE     \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591   F", "px": 44, "color": [200, 224, 255]},
+                {"t": "INTELLIGENCE  \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591   D", "px": 44, "color": [200, 224, 255]},
+                {"gap": 20},
+                {"parts": [
+                    {"t": "LUCK          ??????????   ", "px": 44, "color": [139, 0, 255]},
+                    {"t": "ERROR", "px": 52, "color": [170, 68, 255]},
+                ]},
+                {"gap": 30},
+                {"t": "WARNING: STAT UNREADABLE", "px": 40, "color": [139, 0, 255]},
+                {"t": "RECOMMENDATION: DO NOT ALLOCATE", "px": 40, "color": [200, 224, 255]},
             ],
         }],
     },
@@ -690,15 +832,13 @@ PANELS = {
         "elements": [{
             "type": "text_block",
             "lines": [
-                "Every scanner I walk past",
-                "freezes the fuck up.",
-                "System said DO NOT ALLOCATE.",
-                "",
-                ("I did that shit anyway.", 1.25),
-                "",
-                "I've been dumping every point",
-                "in Luck ever since.",
-                ("Fuck what they say.", 1.15),
+                {"t": "Every scanner I walk past", "px": 60, "mb": 10},
+                {"t": "freezes the fuck up.", "px": 62, "mb": 12},
+                {"t": "System said DO NOT ALLOCATE.", "px": 60, "mb": 100},
+                {"t": "I did that shit anyway.", "px": 105, "mb": 100},
+                {"t": "I've been dumping every point", "px": 55, "mb": 8},
+                {"t": "in Luck ever since.", "px": 58, "mb": 80},
+                {"t": "Fuck what they say.", "px": 82, "mb": 0},
             ],
         }],
     },
@@ -709,18 +849,16 @@ PANELS = {
         "elements": [{
             "type": "text_block",
             "lines": [
-                ("Anyway.", 1.15),
-                "",
-                "Three weeks after graduation,",
-                "I stopped at a 7-Eleven",
-                "on the way home from practice.",
-                "",
-                "And a Gate opened up.",
-                "Right there. On my block.",
-                "Just cracked open",
-                "like some lazy-ass motherfucker",
-                "forgot to close the refrigerator door",
-                ("to another fucking dimension.", 1.4),
+                {"t": "Anyway.", "px": 80, "mb": 90},
+                {"t": "Three weeks after graduation,", "px": 55, "mb": 8},
+                {"t": "I stopped at a 7-Eleven", "px": 55, "mb": 8},
+                {"t": "on the way home from practice.", "px": 55, "mb": 90},
+                {"t": "And a Gate opened up.", "px": 65, "mb": 10},
+                {"t": "Right there. On my block.", "px": 60, "mb": 10},
+                {"t": "Just cracked open", "px": 55, "mb": 8},
+                {"t": "like some lazy-ass motherfucker", "px": 52, "mb": 8},
+                {"t": "forgot to close the refrigerator door", "px": 50, "mb": 10},
+                {"t": "to another fucking dimension.", "px": 88, "mb": 0},
             ],
         }],
     },
@@ -748,21 +886,19 @@ PANELS = {
         "elements": [{
             "type": "text_block",
             "lines": [
-                "Three B-rank hunters",
-                "got pulled in with me.",
-                ("Two didn't make it out.", 1.1),
-                ("Weak-ass bitches.", 1.15),
-                "",
-                "I came out with a monster core,",
-                "an empty sandwich wrapper,",
-                "and a level up notification.",
-                "",
-                "I put the point in Luck, obviously.",
-                "Darius \u2014 the one hunter",
-                "who survived \u2014",
-                "hasn't looked me in the eye since.",
-                ("I respect that shit.", 1.1),
-                "Nigga probably still traumatized.",
+                {"t": "Three B-rank hunters", "px": 55, "mb": 8},
+                {"t": "got pulled in with me.", "px": 55, "mb": 12},
+                {"t": "Two didn't make it out.", "px": 65, "mb": 8},
+                {"t": "Weak-ass bitches.", "px": 82, "mb": 80},
+                {"t": "I came out with a monster core,", "px": 48, "mb": 6},
+                {"t": "an empty sandwich wrapper,", "px": 48, "mb": 6},
+                {"t": "and a level up notification.", "px": 48, "mb": 75},
+                {"t": "I put the point in Luck, obviously.", "px": 50, "mb": 10},
+                {"t": "Darius -- the one hunter", "px": 48, "mb": 6},
+                {"t": "who survived --", "px": 48, "mb": 6},
+                {"t": "hasn't looked me in the eye since.", "px": 48, "mb": 12},
+                {"t": "I respect that shit.", "px": 68, "mb": 8},
+                {"t": "Nigga probably still traumatized.", "px": 52, "mb": 0},
             ],
         }],
     },
@@ -774,18 +910,15 @@ PANELS = {
         "elements": [{
             "type": "text_block",
             "lines": [
-                ("By midnight my name", 0.85),
-                ("was everywhere.", 0.85),
-                "",
-                ("Hunter forums. News sites.", 0.95),
-                ("Twelve guild masters", 0.95),
-                ("got the same notification.", 0.95),
-                ("Simultaneously.", 1.0),
-                "",
-                ("Nobody knew who the fuck I was.", 1.25),
-                "",
-                ("They were about to make it", 1.15),
-                ("weird as hell.", 1.45),
+                {"t": "By midnight my name", "px": 48, "mb": 6},
+                {"t": "was everywhere.", "px": 50, "mb": 80},
+                {"t": "Hunter forums. News sites.", "px": 55, "mb": 10},
+                {"t": "Twelve guild masters", "px": 55, "mb": 8},
+                {"t": "got the same notification.", "px": 55, "mb": 10},
+                {"t": "Simultaneously.", "px": 62, "mb": 90},
+                {"t": "Nobody knew who the fuck I was.", "px": 78, "mb": 90},
+                {"t": "They were about to make it", "px": 68, "mb": 8},
+                {"t": "weird as hell.", "px": 115, "mb": 0},
             ],
         }],
     },
@@ -813,15 +946,11 @@ PANELS = {
         "elements": [{
             "type": "title_card",
             "lines": [
-                ("\u201cI started as nobody.\u201d", 1.0),
-                "",
-                ("\u201cThis is how that changed.\u201d", 1.0),
-                "",
-                "",
-                ("HOLLOW ZOUNDS", 1.8),
-                "",
-                ("Chapter 1: \u201cThat's Crazy. Anyway.\u201d", 0.85),
-                ("\u2192 Starts Now", 0.75),
+                {"t": "\u201cI started as nobody.\u201d", "px": 62, "mb": 80},
+                {"t": "\u201cThis is how that changed.\u201d", "px": 62, "mb": 160},
+                {"t": "HOLLOW ZOUNDS", "px": 130, "mb": 100},
+                {"t": "Chapter 1: \u201cThat's Crazy. Anyway.\u201d", "px": 42, "mb": 12},
+                {"t": ">> Starts Now", "px": 36, "mb": 0},
             ],
         }],
     },
