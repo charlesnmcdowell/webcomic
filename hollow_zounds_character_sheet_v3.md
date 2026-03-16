@@ -55,7 +55,7 @@
 
 ## THE MOTIVATION (aka why he keeps grinding luck)
 
-At his high school graduation after-party, Hollow overheard a group of guys talking about *"getting lucky at prom"* and laughing at him for not getting lucky. 
+At his high school graduation after-party, Hollow overheard a group of guys talking about *"getting lucky at prom"* and laughing at him for not getting lucky.
 
 He didn't fully understand what they meant.
 
@@ -63,7 +63,7 @@ What he DID understand was: luck = success with women. So ever since that night,
 
 It will not work the way he thinks it will. What it IS doing is turning him into the most broken, unkillable, statistically impossible hunter in recorded history. He has no idea. He just knows the grind isn't done yet.
 
-He keeps a **physical journal titled "Operation Get Lucky"** that reads like a deranged romance manga on the surface but is accidentally one of the most brilliant hunter strategy logs ever written. He would be mortified if anyone read it. Several S-rank hunters have tried to steal it believing it contains secret combat philosophy. It contains a ranked list of his top 10 waifu and a note that says *"if luck stat hits 100 maybe she will notice me??"*
+He keeps a **physical journal titled "Operation Get Lucky"** that reads like a deranged romance manga on the surface but is accidentally one of the most brilliant hunter strategy logs ever written. He would be mortified if anyone read it. Several S-rank hunters have tried to steal it believing it contains secret combat philosophy. It contains a ranked tier list of his top 10 waifu and a note that says *"if luck stat hits 100 maybe she will notice me??"*
 
 ---
 
@@ -71,15 +71,17 @@ He keeps a **physical journal titled "Operation Get Lucky"** that reads like a d
 
 Hollow grew up with his grandma in a two-bedroom apartment. Mom's not in the picture, dad's a story for later. Grandma thinks the hunter stuff is dangerous but she also knows the dungeon clearing money would change their lives — so she doesn't stop him. She just makes him take a sandwich.
 
-He never awakened through any official channel. One night, walking home from a 7-Eleven, a D-rank gate cracked open on his block and pulled him and three licensed hunters inside. The hunters died. Hollow came out eating the remainder of his sandwich, mildly confused, holding a monster core.
+He never awakened through any official channel. One night, walking home from a 7-Eleven, a D-rank gate cracked open on his block and pulled him and three licensed hunters inside. **Two of the hunters died. One — Hunter A, Darius Lowe — survived, largely because of Hollow's accidental interventions.** Hollow came out eating the remainder of his sandwich, mildly confused, holding a monster core.
 
-The hunter association put him in their system. Rank: **E**. Luck stat: **[ERROR]**. The story begins the day his name hits the internet and the entire hunter community collectively asks *"who is this little dude?"*
+Darius Lowe becomes the only person who witnessed what actually happened inside that gate. He doesn't fully understand it either. But he knows what he saw.
+
+The hunter association put Hollow in their system. Rank: **E**. Luck stat: **[ERROR]**. The story begins the day his name hits the internet and the entire hunter community collectively asks *"who is this little dude?"*
 
 ---
 
 ## CHARACTER ARC (LONG GAME)
 
-The joke runs the entire series. The real "getting lucky" moment — whenever it comes — will hit like a freight train emotionally because of how long and how hard this boy has been grinding for the wrong reasons. 
+The joke runs the entire series. The real "getting lucky" moment — whenever it comes — will hit like a freight train emotionally because of how long and how hard this boy has been grinding for the wrong reasons.
 
 The series ends when he finally gets lucky. In every sense of the word.
 
@@ -96,6 +98,16 @@ The series ends when he finally gets lucky. In every sense of the word.
 - His stat screen randomly displays "GRINDING..." instead of a number. He takes this as encouragement.
 - Hunters have died trying to steal "Operation Get Lucky." None of them found what they were looking for.
 - He owns at least one waifu pillow for every major anime arc he's been through. They are organized by tier list.
+
+---
+
+## KEY RECURRING CHARACTER — DARIUS LOWE
+
+- **Hunter A** from Chapter 0. The only witness to what happened in that gate.
+- Age 31. Three kids. Tired. Not paid enough for this.
+- Has no idea how to explain what he saw. His official report just says *"civilian assisted."*
+- Will become an unlikely recurring presence in Hollow's life — equal parts frustrated, protective, and deeply confused.
+- Running gag: every time something insane happens around Hollow, the camera cuts to Darius's face. Just his face. No words needed.
 
 ---
 
