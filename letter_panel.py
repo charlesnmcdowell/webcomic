@@ -1,5 +1,5 @@
 """
-Hollow Zounds — Chapter 0 Panel Letterer (v3)
+Hollow Zounds — Chapter 0 Panel Letterer (v4)
 ==============================================
 Data-driven letterer for all 14 panels + end card of Chapter 0.
 Generates text-only panels from scratch and letters art panels with
@@ -693,7 +693,7 @@ def render_floating(draw, elem, fonts, w, h):
 
 
 # ═══════════════════════════════════════════════════════════════════════
-#  PANEL CONFIGS — Chapter 0 (v3), 14 panels + end card
+#  PANEL CONFIGS — Chapter 0 (v4), 14 panels + end card
 #
 #  "base":     "text" | "art" | "dark" | "black"
 #  "top_extend": pixels to extend for vertical conversion (art only)
@@ -713,12 +713,13 @@ PANELS = {
         "base": "text",
         "elements": [{
             "type": "text_block",
-            "letter_spacing": 0,
             "lines": [
-                {"t": "My name is Hollow Zounds.", "px": 90, "mb": 80},
-                {"t": "Yeah. That's a real-ass name, nigga.", "px": 68, "mb": 10},
-                {"t": "I looked that shit up. It's a whole thing.", "px": 68, "mb": 100},
-                {"t": "Anyway.", "px": 160, "mb": 0},
+                {"t": "My name is Hollow Zounds.", "px": 90, "mb": 60},
+                {"t": "Yeah. That's a real-ass name.", "px": 68, "mb": 10},
+                {"t": "It's straight Latin.", "px": 68, "mb": 8},
+                {"t": "I heard that shit in Latin class.", "px": 64, "mb": 80},
+                {"t": "Latin's a dead language.", "px": 68, "mb": 10},
+                {"t": "But here I am.", "px": 120, "mb": 0},
             ],
         }],
     },
@@ -739,11 +740,13 @@ PANELS = {
                 {"t": "I'm 18. Just graduated.", "px": 72, "mb": 8},
                 {"t": "I live with my grandma.", "px": 72, "mb": 8},
                 {"t": "I do sword shit. Self-taught.", "px": 72, "mb": 60},
-                {"t": "My sensei quit after three months", "px": 72, "mb": 8},
-                {"t": "'cause my form was actual dog ass.", "px": 72, "mb": 120},
-                {"t": "I kept going.", "px": 130, "mb": 16},
-                {"t": "Sensei made the right call honestly.", "px": 72, "mb": 8},
-                {"t": "That nigga was scared.", "px": 110, "mb": 0},
+                {"t": "My sensei quit after three months.", "px": 68, "mb": 8},
+                {"t": "Said my form was a danger", "px": 68, "mb": 8},
+                {"t": "to everyone in the room.", "px": 68, "mb": 80},
+                {"t": "I kept going anyway.", "px": 100, "mb": 16},
+                {"t": "Sensei made the right call.", "px": 68, "mb": 8},
+                {"t": "That nigga moved to another state", "px": 68, "mb": 8},
+                {"t": "after I kept showing up.", "px": 90, "mb": 0},
             ],
         }],
     },
@@ -762,10 +765,13 @@ PANELS = {
             "type": "text_block",
             "lines": [
                 {"t": "I'm also a programmer.", "px": 72, "mb": 10},
-                {"t": "Built my own hunter stat tracker app.", "px": 58, "mb": 100},
-                {"t": "It's advanced as fuck.", "px": 80, "mb": 12},
-                {"t": "You probably wouldn't understand", "px": 56, "mb": 10},
-                {"t": "the UI, dumbass.", "px": 85, "mb": 0},
+                {"t": "Built my own hunter stat tracker app.", "px": 58, "mb": 80},
+                {"t": "It's advanced as hell.", "px": 80, "mb": 60},
+                {"t": "Some dude left a review last week", "px": 50, "mb": 6},
+                {"t": 'that just said "UI is straight ass."', "px": 50, "mb": 60},
+                {"t": "I replied under it:", "px": 52, "mb": 8},
+                {"t": '"It totally kicks ass, my guy."', "px": 68, "mb": 60},
+                {"t": "He ain't say shit back.", "px": 62, "mb": 0},
             ],
         }],
     },
@@ -783,15 +789,15 @@ PANELS = {
         "elements": [{
             "type": "text_block",
             "lines": [
-                {"t": "Oh right. The luck stat.", "px": 100, "mb": 80},
-                {"t": "So here's the thing.", "px": 72, "mb": 8},
-                {"t": "After the incident --", "px": 72, "mb": 8},
-                {"t": "which I'll get to --", "px": 72, "mb": 8},
-                {"t": "the system gave me a stat screen.", "px": 72, "mb": 80},
-                {"t": "Every other stat came back normal.", "px": 72, "mb": 8},
-                {"t": "Luck just said ERROR,", "px": 72, "mb": 8},
-                {"t": "that dumb bitch.", "px": 140, "mb": 24},
-                {"t": "still does.", "px": 52, "mb": 0, "color": [85, 85, 85]},
+                {"t": "Oh right. The luck stat.", "px": 90, "mb": 80},
+                {"t": "System gave me a stat screen", "px": 58, "mb": 6},
+                {"t": "after the incident.", "px": 58, "mb": 10},
+                {"t": "Luck came back ERROR.", "px": 68, "mb": 8},
+                {"t": "Said DO NOT ALLOCATE.", "px": 62, "mb": 80},
+                {"t": "I allocated.", "px": 120, "mb": 80},
+                {"t": "I'm tryna get lucky out here.", "px": 62, "mb": 8},
+                {"t": "You already know what I mean.", "px": 58, "mb": 10},
+                {"t": "Been maxing that shit ever since.", "px": 68, "mb": 0},
             ],
         }],
     },
@@ -826,19 +832,27 @@ PANELS = {
         }],
     },
 
-    # ── PANEL 9: TEXT ONLY — "I did that shit anyway" ────────────────
+    # ── PANEL 9: TEXT ONLY — Scanners + grandma joke ─────────────────
     9: {
         "base": "text",
         "elements": [{
             "type": "text_block",
             "lines": [
-                {"t": "Every scanner I walk past", "px": 60, "mb": 10},
-                {"t": "freezes the fuck up.", "px": 62, "mb": 12},
-                {"t": "System said DO NOT ALLOCATE.", "px": 60, "mb": 100},
-                {"t": "I did that shit anyway.", "px": 105, "mb": 100},
-                {"t": "I've been dumping every point", "px": 55, "mb": 8},
-                {"t": "in Luck ever since.", "px": 58, "mb": 80},
-                {"t": "Fuck what they say.", "px": 82, "mb": 0},
+                {"t": "Every scanner I walk past glitches out.", "px": 52, "mb": 8},
+                {"t": "Three agents wrote official reports", "px": 52, "mb": 8},
+                {"t": "on government letterhead", "px": 52, "mb": 8},
+                {"t": 'talking about "equipment malfunction."', "px": 52, "mb": 60},
+                {"t": "It ain't malfunctioning.", "px": 68, "mb": 12},
+                {"t": "I put my first point in Luck", "px": 52, "mb": 8},
+                {"t": "the night of the incident.", "px": 52, "mb": 12},
+                {"t": "System said DO NOT ALLOCATE.", "px": 58, "mb": 8},
+                {"t": "I did it anyway.", "px": 80, "mb": 60},
+                {"t": "Been dumping every point into Luck ever since.", "px": 46, "mb": 12},
+                {"t": "One of them looked at me crazy", "px": 52, "mb": 8},
+                {"t": "and I just said", "px": 52, "mb": 12},
+                {"t": '"I live with my grandma, bro."', "px": 72, "mb": 12},
+                {"t": "He ain't say shit back.", "px": 60, "mb": 8},
+                {"t": "I respect that.", "px": 68, "mb": 0},
             ],
         }],
     },
@@ -849,16 +863,14 @@ PANELS = {
         "elements": [{
             "type": "text_block",
             "lines": [
-                {"t": "Anyway.", "px": 80, "mb": 90},
-                {"t": "Three weeks after graduation,", "px": 55, "mb": 8},
-                {"t": "I stopped at a 7-Eleven", "px": 55, "mb": 8},
-                {"t": "on the way home from practice.", "px": 55, "mb": 90},
-                {"t": "And a Gate opened up.", "px": 65, "mb": 10},
-                {"t": "Right there. On my block.", "px": 60, "mb": 10},
-                {"t": "Just cracked open", "px": 55, "mb": 8},
-                {"t": "like some lazy-ass motherfucker", "px": 52, "mb": 8},
+                {"t": "Three weeks after graduation", "px": 58, "mb": 8},
+                {"t": "I stopped at the 7-Eleven", "px": 58, "mb": 8},
+                {"t": "on the way home from practice.", "px": 58, "mb": 80},
+                {"t": "And a whole Gate cracked open", "px": 68, "mb": 8},
+                {"t": "right on my block.", "px": 68, "mb": 80},
+                {"t": "Like some lazy-ass nigga", "px": 55, "mb": 8},
                 {"t": "forgot to close the refrigerator door", "px": 50, "mb": 10},
-                {"t": "to another fucking dimension.", "px": 88, "mb": 0},
+                {"t": "TO ANOTHER FUCKING DIMENSION.", "px": 80, "mb": 0},
             ],
         }],
     },
@@ -886,39 +898,34 @@ PANELS = {
         "elements": [{
             "type": "text_block",
             "lines": [
-                {"t": "Three B-rank hunters", "px": 55, "mb": 8},
-                {"t": "got pulled in with me.", "px": 55, "mb": 12},
-                {"t": "Two didn't make it out.", "px": 65, "mb": 8},
-                {"t": "Weak-ass bitches.", "px": 82, "mb": 80},
-                {"t": "I came out with a monster core,", "px": 48, "mb": 6},
-                {"t": "an empty sandwich wrapper,", "px": 48, "mb": 6},
-                {"t": "and a level up notification.", "px": 48, "mb": 75},
-                {"t": "I put the point in Luck, obviously.", "px": 50, "mb": 10},
-                {"t": "Darius -- the one hunter", "px": 48, "mb": 6},
-                {"t": "who survived --", "px": 48, "mb": 6},
-                {"t": "hasn't looked me in the eye since.", "px": 48, "mb": 12},
-                {"t": "I respect that shit.", "px": 68, "mb": 8},
-                {"t": "Nigga probably still traumatized.", "px": 52, "mb": 0},
+                {"t": "Three B-rank hunters got sucked in with me.", "px": 50, "mb": 8},
+                {"t": "Two of them folded immediately.", "px": 60, "mb": 80},
+                {"t": "I walked out with a monster core,", "px": 50, "mb": 6},
+                {"t": "an empty sandwich wrapper,", "px": 50, "mb": 6},
+                {"t": "and a level up notification.", "px": 50, "mb": 70},
+                {"t": "Obviously put the point in Luck.", "px": 60, "mb": 80},
+                {"t": "Darius -- the one who survived --", "px": 52, "mb": 8},
+                {"t": "still won't look me in the eye.", "px": 52, "mb": 12},
+                {"t": "We live in the same city.", "px": 58, "mb": 8},
+                {"t": "I've seen him three times.", "px": 60, "mb": 70},
+                {"t": "I respect it.", "px": 72, "mb": 8},
+                {"t": "Nigga saw some shit.", "px": 62, "mb": 0},
             ],
         }],
     },
 
     # ── PANEL 13: TEXT ONLY — Name hits the internet ─────────────────
-    #    Typography note: text gets progressively larger toward bottom
     13: {
         "base": "text",
         "elements": [{
             "type": "text_block",
             "lines": [
-                {"t": "By midnight my name", "px": 48, "mb": 6},
-                {"t": "was everywhere.", "px": 50, "mb": 80},
-                {"t": "Hunter forums. News sites.", "px": 55, "mb": 10},
-                {"t": "Twelve guild masters", "px": 55, "mb": 8},
-                {"t": "got the same notification.", "px": 55, "mb": 10},
-                {"t": "Simultaneously.", "px": 62, "mb": 90},
-                {"t": "Nobody knew who the fuck I was.", "px": 78, "mb": 90},
-                {"t": "They were about to make it", "px": 68, "mb": 8},
-                {"t": "weird as hell.", "px": 115, "mb": 0},
+                {"t": "By midnight my name was everywhere.", "px": 58, "mb": 80},
+                {"t": "Forums. News sites.", "px": 62, "mb": 10},
+                {"t": "Twelve guild masters got the same", "px": 55, "mb": 8},
+                {"t": "notification at the same time.", "px": 55, "mb": 80},
+                {"t": "Nobody knew who the fuck I was.", "px": 78, "mb": 80},
+                {"t": "They were about to make it weird.", "px": 80, "mb": 0},
             ],
         }],
     },
@@ -927,17 +934,7 @@ PANELS = {
     14: {
         "base": "art",
         "top_extend": 0,
-        "elements": [
-            {"type": "narration", "pos": (0.04, 0.72), "width": 0.70,
-             "lines": [
-                 "Rank E. Luck stat: ERROR. One level.",
-                 "First gate cleared. First point spent.",
-                 "Operation Get Lucky. Day 1.",
-             ]},
-            {"type": "floating",
-             "text": "Day 1, nigga.",
-             "pos": (0.50, 0.92), "font_scale": 0.042},
-        ],
+        "elements": [],
     },
 
     # ── PANEL 15: END CARD — Black bg, chapter tease ────────────────
