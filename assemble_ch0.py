@@ -476,16 +476,19 @@ def assemble():
     segments = []
     for i, panel in enumerate(panels):
         if i == 0:
-            segments.append(panel)
+            top_crop = panel.crop((0, 0, panel.width, panel.height - FADE_H))
+            segments.append(top_crop)
         else:
             prev = panels[i - 1]
             blend = blend_edge(prev, panel, FADE_H)
-
-            cropped_panel = panel.crop((FADE_H, 0, panel.width, panel.height))
-            cropped_panel = panel.crop((0, FADE_H, panel.width, panel.height))
-
             segments.append(blend)
-            segments.append(cropped_panel)
+
+            is_last = (i == len(panels) - 1)
+            if is_last:
+                cropped = panel.crop((0, FADE_H, panel.width, panel.height))
+            else:
+                cropped = panel.crop((0, FADE_H, panel.width, panel.height - FADE_H))
+            segments.append(cropped)
 
     total_h = sum(s.height for s in segments)
     print(f"[*] Total strip: {TARGET_W}x{total_h}px")
