@@ -558,11 +558,17 @@ New characters emerge. Existing characters reassess.
 Systems strain under the weight of someone they
 weren't designed to handle.
 
-**PASS:** After Chapter 1 — Apex changes Hollow's file.
-Hunters start talking about him differently.
-Someone who dismissed him now takes him seriously.
-**FAIL:** World stays static while protagonist grows.
-Nobody notices. Nobody changes their behavior.
+**CRITICAL TIMING NOTE:**
+The world cannot react faster than is realistically possible.
+A gate incident does not make someone famous overnight.
+News covers the incident — not the survivor's identity.
+Factions are notified through their own systems — not the news.
+The protagonist's name spreading takes time and chapters.
+
+**PASS:** News covers the gate incident. Two survivors.
+Identities not released. Factions notified separately.
+**FAIL:** "By midnight my name was everywhere" —
+nobody knew his name. The incident was everywhere. He wasn't.
 
 ### Rule 31: The Shadow Antagonist
 There must always be a force larger than the immediate

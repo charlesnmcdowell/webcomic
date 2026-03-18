@@ -498,7 +498,7 @@ Darius visible in background watching with concern.
 Narration box: "Then my stuff disappeared into thin air."
 
 **Floating punchline:**
-"I respected that."
+"Oh no. My precious loot."
 
 ---
 
@@ -586,16 +586,14 @@ carried loosely, casually, like he found it on the ground.
 Police tape and emergency vehicles behind him.
 
 **TEXT:**
-Narration box 1: "Two Anoms didn't make it out."
-Narration box 2: "The gate closed when the boss went down."
-Narration box 3: "I walked out with an empty sandwich wrapper"
-Narration box 4: "and a notification I didn't understand."
+Narration box 1: "Found my snacks from the 7-Eleven."
+Narration box 2: "Started making my way home."
+Narration box 3: "Trying to understand my level up notification."
 
 *Small glitched system notification floating near him:*
 Glitched text: "LEVEL UP — STAT ALLOCATION: ///PROCESSING///"
 
-*The sword and core are already in inventory per Panel 7-VI.*
-*No contradiction. No explanation needed.*
+*No explanation. Reader sees the glitch. Doesn't know what it means.*
 *Chapter 1 reveals what the notification means.*
 
 ---
@@ -609,12 +607,12 @@ Glitched text: "LEVEL UP — STAT ALLOCATION: ///PROCESSING///"
 **ART:** News reporter aftermath — already generated panel_9.jpg.
 
 **TEXT:**
-Narration box 1: "By midnight my name was everywhere."
-Narration box 2: "Three factions. Same notification. Same time."
-Narration box 3: "Nobody knew who I was."
+Narration box 1: "By midnight the news was everywhere."
+Narration box 2: "Gate incident on the lower east side."
+Narration box 3: "Two survivors. Identities not released."
 
 **Floating closer:**
-"They were about to find out."
+"I was one of them."
 
 ---
 
@@ -630,8 +628,11 @@ HOLLOW ZOUNDS in the street reflection. Clean. No text.
 
 ## TITLE CARD — FULL BLACK
 
-"I started as nobody."
-"This is how that changed."
+"That was a weird night."
+
+"Anyway."
+
+"At least I still had my snacks."
 
 HOLLOW ZOUNDS
 Chapter 1: "That's Crazy. Anyway."

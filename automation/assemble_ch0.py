@@ -148,7 +148,7 @@ def render_panel_0():
         "Ten years ago Void Holes started opening.",
         "Creatures came out.",
         "People with abilities became Anoms.",
-    ], 40, int(img.height * 0.06))
+    ], 40, int(img.height * 0.15))
     return img
 
 
@@ -191,7 +191,7 @@ def render_panel_2b():
     draw_narration_boxes(draw, [
         "Anoms run Voids for a living.",
         "Good ones make serious money.",
-    ], 40, int(img.height * 0.04))
+    ], 40, int(img.height * 0.15))
     return img
 
 
@@ -225,13 +225,21 @@ def render_panel_4():
         "I awakened three months ago.",
         "Haven't been approved for a contract yet.",
         "Haven't run a single Void.",
-    ], 40, int(img.height * 0.04))
+    ], 40, int(img.height * 0.15))
     return img
 
 
 def render_panel_6a():
-    """Void Hole opening -- narration overlay on baked-text art."""
+    """Void Hole opening -- all text baked into art. No overlay."""
     img = load_art("panel 6a.jpg")
+    if img is None:
+        img = dark_panel(2400)
+    return img
+
+
+def render_panel_6b():
+    """Apex arrives -- carries narration from 6A + 6B."""
+    img = load_art("panel 6b.jpg")
     if img is None:
         img = dark_panel(2400)
     draw = ImageDraw.Draw(img)
@@ -240,27 +248,14 @@ def render_panel_6a():
     draw_narration_boxes(draw, [
         "Three weeks after graduation.",
         "Stopped at the 7-Eleven on the way home from practice.",
-    ], 40, int(h * 0.02))
+        "Faction response team showed up two minutes later.",
+        "Then the Void Hole pulled us all in.",
+    ], 40, int(h * 0.15))
 
     draw_floating_lines(draw, [
         "Like somebody forgot to close the refrigerator door",
         "to another dimension.",
-    ], int(h * 0.86), font_size=38)
-    return img
-
-
-def render_panel_6b():
-    """Apex arrives -- Hollow + agents before pull-in."""
-    img = load_art("panel 6b.jpg")
-    if img is None:
-        img = dark_panel(2400)
-    draw = ImageDraw.Draw(img)
-    h = img.height
-
-    draw_narration_boxes(draw, [
-        "Faction response team showed up two minutes later.",
-        "Then the Void Hole pulled us all in.",
-    ], 40, int(h * 0.04))
+    ], int(h * 0.82), font_size=38)
     return img
 
 
@@ -273,14 +268,10 @@ def render_panel_7():
 
 
 def render_panel_7b():
-    """Boss kill -- spider queen climax."""
+    """Boss kill -- spider queen climax. Image carries everything."""
     img = load_art("panel 7b.jpg")
     if img is None:
         img = dark_panel(2400, (12, 10, 22))
-    draw = ImageDraw.Draw(img)
-    draw_narration_boxes(draw, [
-        "The other two didn't make it to the boss room.",
-    ], 40, int(img.height * 0.04), font_size=32)
     return img
 
 
@@ -299,7 +290,7 @@ def render_panel_7d():
         img = dark_panel()
     draw = ImageDraw.Draw(img)
     draw_narration_boxes(draw, ["Obviously said yes."],
-                         40, int(img.height * 0.04))
+                         40, int(img.height * 0.15))
     return img
 
 
@@ -313,9 +304,9 @@ def render_panel_7e():
 
     draw_narration_boxes(draw, [
         "Then my stuff disappeared into thin air.",
-    ], 40, int(h * 0.04))
+    ], 40, int(h * 0.15))
 
-    draw_floating_lines(draw, ['"I respected that."'],
+    draw_floating_lines(draw, ['"Oh no. My precious loot."'],
                         int(h * 0.88), font_size=46)
     return img
 
@@ -327,11 +318,10 @@ def render_panel_8():
         img = dark_panel()
     draw = ImageDraw.Draw(img)
     draw_narration_boxes(draw, [
-        "Two Anoms didn't make it out.",
-        "The gate closed when the boss went down.",
-        "I walked out with an empty sandwich wrapper",
-        "and a notification I didn't understand.",
-    ], 40, int(img.height * 0.04))
+        "Found my snacks from the 7-Eleven.",
+        "Started making my way home.",
+        "Trying to understand my level up notification.",
+    ], 40, int(img.height * 0.15))
     return img
 
 
@@ -344,12 +334,12 @@ def render_panel_9():
     h = img.height
 
     draw_narration_boxes(draw, [
-        "By midnight my name was everywhere.",
-        "Three factions. Same notification. Same time.",
-        "Nobody knew who I was.",
-    ], 40, int(h * 0.04))
+        "By midnight the news was everywhere.",
+        "Gate incident on the lower east side.",
+        "Two survivors. Identities not released.",
+    ], 40, int(h * 0.15))
 
-    draw_floating_lines(draw, ["They were about to find out."],
+    draw_floating_lines(draw, ['"I was one of them."'],
                         int(h * 0.88), font_size=46)
     return img
 
@@ -363,22 +353,21 @@ def render_panel_10():
 
 
 def render_panel_11():
-    """Title card."""
-    img = load_art("panel 11.png")
-    if img is not None:
-        return img
-
+    """Title card -- always generated to match latest script text."""
     img = Image.new("RGBA", (TARGET_W, 1920), (0, 0, 0, 255))
     draw = ImageDraw.Draw(img)
     lines = [
-        ('"I started as nobody."', 62),
-        ('"This is how that changed."', 62),
+        ('"That was a weird night."', 62),
+        ("", 0),
+        ('"Anyway."', 62),
+        ("", 0),
+        ('"At least I still had my snacks."', 52),
         ("", 0),
         ("HOLLOW ZOUNDS", 130),
         ('Chapter 1: "That\'s Crazy. Anyway."', 42),
         (">> Starts Now", 36),
     ]
-    y = 600
+    y = 400
     for text, size in lines:
         if not text:
             y += 100
