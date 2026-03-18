@@ -330,24 +330,6 @@ It also made his grandma sick.
 Hollow does not know any of this yet.
 This is revealed gradually across multiple chapters.
 
-### HZ Rule 9: The Shadow Creatures Are The Thread
-The shadow creatures from Panel 2A are the visual
-representation of the larger antagonist force.
-
-They must ALWAYS look distinctly different from all other
-Void creatures in every chapter they appear:
-- Traditional Void creatures: orcs, goblins, spiders,
-  lycanthropes — fantasy dungeon monsters
-- Shadow creatures: dark, formless, wrong — they don't
-  belong in any Void classification system
-
-Their connection to Hollow's awakening, grandma's Void
-Sickness, and Hero Status is the central mystery
-of the series. Never explain early. Let it build.
-
-The reader will notice the visual difference before
-they understand what it means. That's the hook.
-
 ---
 
 ## SECTION 8 — PRE-GENERATION CHECKLIST
@@ -633,65 +615,6 @@ specific unanswered question driving the reader forward.
 | Void Sickness | Illness caused by Void energy exposure |
 | Void Surge | Lower ranked Void Hole with unexpectedly dangerous interior |
 | Location | New York City — locked as of Chapter 0 |
-| Shadow Creatures | Unknown entities — distinct from all known Void creatures |
-
----
-
-## RANK SYSTEM MECHANICS
-
-- When you awaken you are assigned a rank — E through S
-- Rank reflects current abilities at time of awakening
-- **Anoms CANNOT naturally get stronger — rank is fixed forever**
-- This is accepted world fact — ten years of precedent
-- High rank Anoms are valuable because they were born that way
-- Low rank Anoms like Hollow are considered worthless
-- **Hollow leveling up is therefore IMPOSSIBLE by known rules**
-- The system giving him a level up notification breaks everything
-- When Factions discover he can level up they will want to
-  study, control, and own him
-
----
-
-## HERO STATUS SYSTEM (Hollow exclusive — Chapter 1+)
-
-- Triggered after killing the spider queen boss
-- Notification: "HERO STATUS: NOW AVAILABLE. LEVEL 1 — ACCEPT?"
-- Only Hollow can see it — nobody else has ever seen this
-- Accepting grants access to:
-  - Personal magical inventory
-  - Stat point allocation on level up
-  - Combination/upgrade mechanic
-  - Future: personal dungeons (Chapter 2+)
-
-## INVENTORY + COMBINATION SYSTEM
-
-- Hero Status grants access to a personal magical inventory
-- Items stored in inventory can be combined if compatible
-- Combining a creature core with a weapon upgrades the weapon
-- Three upgrade options appear — different stat paths
-- Hollow picks based on vibes. Obviously.
-- Higher tier cores = higher tier upgrades
-- Factions do NOT know Hollow has this system
-- Nobody has ever had this system before
-- Regular Anoms sell creature cores to Factions for money
-- Hollow can USE cores to upgrade gear instead
-- This gives him a permanent advantage nobody can explain
-
-## PROGRESSION LOOP
-
-Run Void → Kill creatures → Get cores
-→ Combine with gear → Upgrade
-→ Stronger gear → Run harder Void → Repeat
-
-## HOLLOW'S STARTING GEAR (End of Chapter 0)
-
-- Magical sword — boss drop from spider queen
-- Glows faintly blue-white
-- Hollow thinks he just found a cool sword
-- It responds to Hero Status — nobody knows this yet
-- One creature core — in his pocket
-- Chapter 1: discovers inventory system accidentally
-- Chapter 1: combines core + sword → 3 upgrade options
 | Void Sickness | Illness caused by Void energy exposure |
 
 ---

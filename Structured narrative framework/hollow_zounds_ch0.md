@@ -27,6 +27,9 @@
 | Rule 21: Timeline realism | ✅ |
 | Rule 22: Action hook before slice of life | ✅ |
 | Rule 23: Character presence justification | ✅ |
+| Rule 24: Chapter 0 hook creates urgency | ✅ |
+| Rule 25: Show the climax | ✅ |
+| Rule 26: Binary choice system event | ✅ |
 | HZ Rule 3: Running gag after hook | ✅ |
 | HZ Rule 4: Grandma after hook | ✅ |
 | HZ Rule 7: Stat reveals Chapter 1 | ✅ |
@@ -104,15 +107,27 @@ Hot dog vendor: "You want mustard or not?"
 
 ## PANEL 2A — VOID IS DANGEROUS
 *(Full height)*
-*Scene job: Show the cost of the Void — world stakes*
-*SNF: Rules 3, 12, 17 ✅*
+*Scene job: Show the cost of the Void — world stakes + plant shadow antagonist thread*
+*SNF: Rules 3, 12, 17, 31 ✅*
 *Fix applied: World narration only — Hollow not introduced yet*
+*HZ Rule 9: Shadow creatures look distinctly different from all other Void creatures*
 
-**ART:** NEW — Inside a Void. Dark, brutal, chaotic.
-An experienced Anom team fighting creatures.
-One Anom going down. Not dramatically.
-Just suddenly. The way real danger works.
+**ART:** Already generated PANEL_2A.jpg.
+Inside a Void. Dark, brutal, chaotic.
+An experienced Anom team being overwhelmed by SHADOW CREATURES —
+dark, formless, wrong. NOT orcs or goblins.
+These creatures don't match any known classification.
+They look like they don't belong in any Void.
+One Anom going down. Just suddenly.
+The way real danger works.
 Teammates can't reach him in time.
+
+NOTE FOR CONTINUITY: These shadow creatures must always look
+distinctly different from the traditional dungeon creatures
+(orcs, goblins, spiders) seen in Panels 2B and 7.
+They are the visual thread of the larger antagonist force.
+Reader will notice the difference even before it's explained.
+This is Hollow's sensei's team. The reader doesn't know that yet.
 
 **TEXT:**
 Narration box 1: "Not everyone makes it out."
@@ -141,8 +156,8 @@ Narration box 2: "Good ones make serious money."
 
 ## PANEL 3 — CHARACTER INTRODUCTION
 *(Medium height)*
-*Scene job: Introduce Hollow in 2 sentences*
-*SNF: Rules 4, 6, 17 ✅*
+*Scene job: Introduce Hollow in 2 sentences + establish stat baseline*
+*SNF: Rules 4, 6, 17, 27 ✅*
 
 **ART:** Hollow portrait — already generated panel_3.jpg.
 Deadpan eye contact. Locs. Anime tee. Unbothered.
@@ -151,18 +166,34 @@ Deadpan eye contact. Locs. Anime tee. Unbothered.
 Narration box 1: "My name is Hollow Zounds."
 Narration box 2: "E-rank. Basically a regular person with paperwork."
 
+**CURSOR NOTE:** Add a barely visible floating stat element
+in the bottom corner of this panel — small, subtle, partially
+transparent. Just two lines:
+RANK: E
+LUCK: ???
+This establishes the progression baseline per Rule 27.
+Reader files it away. Chapter 1 reveals the full stat screen.
+
 ---
 
 ## PANEL 4 — STAKES VISIBLE
 *(Medium height)*
 *Scene job: Show what Hollow stands to lose*
-*SNF: Rules 5, 19, 22 ✅*
+*SNF: Rules 5, 19, 22, 28 ✅*
 *Fix applied: Removed grandma dialogue — slice of life too early*
+*Fix applied: Medical bill visible — plants grandma sick storyline*
 
-**ART:** NEW — Grandma's apartment kitchen table.
+**ART:** Already generated panel_4.jpg.
+Grandma's apartment kitchen table.
 Stack of bills. FINAL NOTICE on top envelope.
 Hollow's E-rank Anom card sitting next to the bills.
 No characters visible. Just the table. The bills. The card.
+
+**CURSOR NOTE:** The bill second from top in the stack
+should show medical or hospital letterhead — partially visible.
+Reader sees it. Files it away. Chapter 1 reveals what it means.
+This plants the grandma Void Sickness storyline visually
+without explaining it yet. Rule 28 — underlying threat.
 
 **TEXT:**
 Narration box 1: "I awakened three months ago."
@@ -240,19 +271,95 @@ Like he is watching something on TV.
 
 ---
 
+## PANEL 7B — BOSS KILL (CLIMAX)
+*(Full height)*
+*Scene job: Show the climactic moment — Rule 25*
+*SNF: Rules 8, 11, 25 ✅*
+
+**ART:** Already generated panel_7a.jpg.
+Wide shot inside Void cave boss chamber.
+Stone walls, stalactites on ceiling, stalagmites on floor.
+Purple void energy crackling everywhere. Webs covering walls.
+
+THE CLIMACTIC MOMENT — action frozen:
+
+CENTER: Giant spider queen — size of a car — suspended
+mid-air. A large stone stalagmite broken from above
+is impaling it. Spider is dying. Ichor and debris everywhere.
+
+LEFT: Hollow. Anime graphic tee. Joggers. Holding a fallen
+Apex agent's military rifle — clearly awkward grip.
+Expression: staring at the spider with mild confusion.
+Not triumphant. Not scared. Just processing.
+He knows that was not the plan.
+
+RIGHT: Darius. Short fade, short beard. Scar above left
+eyebrow. Apex vest visible. Staring at Hollow with wide eyes.
+He cannot explain what he just witnessed.
+
+Bullet ricochet lines visible on cave walls —
+showing the path bullets traveled before hitting
+the stalagmite. The physics of the lucky shot visible.
+
+**CURSOR NOTE:** Add a faintly glowing sword visible on the
+ground near the dead spider — partially obscured by debris.
+Blue-white glow. Small. Not dramatic. Just there.
+Boss drop. Reader sees it. Hollow will pick it up.
+This is his first piece of gear. Chapter 0 plants it.
+Chapter 1 reveals what it is.
+
+**TEXT:**
+*Silent panel — no narration boxes.*
+*The image tells the entire story.*
+
+---
+
+## PANEL 7C — HERO STATUS NOTIFICATION
+*(Medium height)*
+*Scene job: Plant the unanswerable question — Rules 24, 26*
+*SNF: Rules 17, 24, 26 ✅*
+
+**ART:** NEW — Close up on Hollow's face. Same cave chamber.
+Spider dead in background. Gate beginning to close.
+Amber gold eyes. Expression: mildly curious.
+Like he just got a weird text message.
+
+Floating in front of his face — holographic notification.
+Glowing blue-white. Clean and crisp.
+ONLY HE CAN SEE IT.
+
+Notification reads exactly:
+"HERO STATUS: NOW AVAILABLE."
+"LEVEL 1 — ACCEPT?"
+
+Two glowing buttons below: YES — bright. NO — dimmer.
+
+Background soft focus: Darius watching Hollow stare
+at nothing. From Darius's view — Hollow is just standing
+still staring at empty air after killing the boss.
+
+**TEXT:**
+*No narration boxes.*
+*The notification IS the text.*
+
+---
 ## PANEL 8 — AFTERMATH
 *(Full height)*
 *Scene job: Show result + plant the mystery*
 *SNF: Rules 8, 15, 17 ✅*
 
-**ART:** NEW — Hollow walking away from closing Void Hole.
-Back to camera. 7-Eleven bag in hand. No sword.
+**ART:** Already generated panel_8.jpg.
+Hollow walking toward camera from closing Void Hole.
+7-Eleven bag in one hand. Glowing sword in the other —
+carried loosely, casually, like he found it on the ground.
 Police tape and emergency vehicles behind him.
 
 **TEXT:**
 Narration box 1: "Two Anoms didn't make it out."
-Narration box 2: "I walked out with a creature core"
-Narration box 3: "and an empty sandwich wrapper."
+Narration box 2: "The gate closed when the boss went down."
+Narration box 3: "I walked out with a creature core,"
+Narration box 4: "a sword I found on the ground,"
+Narration box 5: "and an empty sandwich wrapper."
 
 *Small glitched system notification floating near him:*
 Glitched text: "LEVEL UP — STAT ALLOCATION: ///PROCESSING///"
@@ -313,14 +420,20 @@ Chapter 1: "That's Crazy. Anyway."
 | 4 | Stakes — bills on table | panel_4.jpg | ✅ Done |
 | 6 | Void Hole opening | panel_6.jpg | ✅ Done |
 | 7 | Battle scene — APEX agents + Hollow | panel_7.jpg | ✅ Done |
-| 8 | Aftermath — walking away | panel_8.jpg | 🔧 Fix in progress |
+| 7B | Boss kill — spider queen climax | NEW | ❌ Generate |
+| 7C | Hero status notification | NEW | ❌ Generate |
+| 8 | Aftermath — walking away | panel_8.jpg | ✅ Done |
 | 9 | World reacts — news | panel_9.jpg | ✅ Done |
 | 10 | Silent closer | panel_10.jpg | ✅ Done |
 | 11 | Title card | panel_11.png | ✅ Done |
 
-**Total panels: 12**
-**Silent panels: 2 (panels 7 and 10)**
-**Estimated read time: 60 seconds**
+**New art needed: 2 panels**
+- Panel 7B: Boss kill — spider queen impaled by stalagmite
+- Panel 7C: Hero status notification close up
+
+**Total panels: 14**
+**Silent panels: 3 (panels 7, 7B, 10)**
+**Estimated read time: 90 seconds**
 
 ---
 
