@@ -1,16 +1,17 @@
-"""Assemble Chapter 0 v5 — Integrated layout.
+"""Assemble Chapter 0 v6.3 — SNF Compliant integrated layout.
 
-Every panel has art with text overlaid as narration boxes or floating text.
-No standalone white text panels. One continuous vertical strip.
+24 panels: 17 art panels + 7 Cursor-generated design panels.
+One continuous vertical strip, seamless transitions.
 """
 
 import os
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CH0_DIR = os.path.join(BASE_DIR, "panels", "ch0")
-FONTS_DIR = os.path.join(BASE_DIR, "fonts")
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
+CH0_DIR = os.path.join(PROJECT_DIR, "panels", "ch0")
+FONTS_DIR = os.path.join(PROJECT_DIR, "fonts")
 
 TARGET_W = 1080
 FADE_H = 200
@@ -18,13 +19,19 @@ FONT_BANGERS = os.path.join(FONTS_DIR, "Bangers-Regular.ttf")
 
 PURPLE = (139, 0, 255)
 WHITE = (255, 255, 255)
-BOX_BG = (0, 0, 0, 191)       # rgba(0,0,0,0.75)
+BOX_BG = (0, 0, 0, 191)
 BOX_BORDER_W = 3
 BOX_PAD_Y = 12
 BOX_PAD_X = 20
 BOX_GAP = 6
-SHADOW_COLOR = (0, 0, 0, 242)  # rgba(0,0,0,0.95)
 
+DARK_PURPLE = (26, 10, 46)
+CRIMSON = (139, 0, 0)
+
+
+# ===================================================================
+#  UTILITY FUNCTIONS
+# ===================================================================
 
 def _font(size):
     return ImageFont.truetype(FONT_BANGERS, size)
@@ -51,8 +58,28 @@ def dark_panel(height=1920, color=(10, 8, 20)):
     return Image.new("RGBA", (TARGET_W, height), (*color, 255))
 
 
-def draw_shadow_text(draw, x, y, text, font, fill=WHITE, shadow_offset=2, shadow_blur=None):
-    """Draw text with a dark shadow for readability over art."""
+def linear_gradient(w, h, top_color, bot_color):
+    arr = np.zeros((h, w, 3), dtype=np.uint8)
+    for row in range(h):
+        t = row / max(h - 1, 1)
+        for c in range(3):
+            arr[row, :, c] = int(top_color[c] * (1 - t) + bot_color[c] * t)
+    return Image.fromarray(arr).convert("RGBA")
+
+
+def radial_gradient(w, h, center_color, edge_color):
+    y_grid, x_grid = np.mgrid[:h, :w]
+    cx, cy = w // 2, h // 2
+    max_dist = np.sqrt(cx ** 2 + cy ** 2)
+    dist = np.sqrt((x_grid - cx) ** 2 + (y_grid - cy) ** 2) / max_dist
+    dist = np.clip(dist, 0, 1)
+    arr = np.zeros((h, w, 3), dtype=np.uint8)
+    for c in range(3):
+        arr[:, :, c] = (center_color[c] * (1 - dist) + edge_color[c] * dist).astype(np.uint8)
+    return Image.fromarray(arr).convert("RGBA")
+
+
+def draw_shadow_text(draw, x, y, text, font, fill=WHITE, shadow_offset=2):
     for dx in range(-shadow_offset, shadow_offset + 1):
         for dy in range(-shadow_offset, shadow_offset + 1):
             if dx == 0 and dy == 0:
@@ -61,28 +88,37 @@ def draw_shadow_text(draw, x, y, text, font, fill=WHITE, shadow_offset=2, shadow
     draw.text((x, y), text, font=font, fill=fill)
 
 
-def draw_narration_boxes(draw, lines, x, y, font_size=36, max_w=None):
-    """Draw stacked narration boxes with purple left border."""
+def draw_outlined_text(draw, x, y, text, font, fill=WHITE,
+                       outline=(0, 0, 0, 255), outline_w=4):
+    for dx in range(-outline_w, outline_w + 1):
+        for dy in range(-outline_w, outline_w + 1):
+            if dx == 0 and dy == 0:
+                continue
+            draw.text((x + dx, y + dy), text, font=font, fill=outline)
+    draw.text((x, y), text, font=font, fill=fill)
+
+
+def draw_narration_boxes(draw, lines, x, y, font_size=36, max_w=None, gap=None):
     if max_w is None:
         max_w = int(TARGET_W * 0.85)
+    if gap is None:
+        gap = BOX_GAP
     font = _font(font_size)
     cy = y
     for line in lines:
         tw, th = _text_size(line, font)
         bw = min(tw + BOX_PAD_X * 2 + BOX_BORDER_W, max_w)
         bh = th + BOX_PAD_Y * 2
-
         draw.rectangle([x, cy, x + bw, cy + bh], fill=BOX_BG)
         draw.rectangle([x, cy, x + BOX_BORDER_W, cy + bh], fill=(*PURPLE, 255))
         draw.text((x + BOX_BORDER_W + BOX_PAD_X, cy + BOX_PAD_Y),
                   line, font=font, fill=WHITE)
-        cy += bh + BOX_GAP
+        cy += bh + gap
     return cy - y
 
 
-def draw_floating_lines(draw, lines, y_start, font_size=42, center=True,
-                        x_offset=None, align="center"):
-    """Draw floating text lines with shadow, no box."""
+def draw_floating_lines(draw, lines, y_start, font_size=48, center=True,
+                        x_offset=None):
     font = _font(font_size)
     cy = y_start
     for line in lines:
@@ -98,302 +134,228 @@ def draw_floating_lines(draw, lines, y_start, font_size=42, center=True,
     return cy - y_start
 
 
-# ═══════════════════════════════════════════════════════════════
-#  PANEL DEFINITIONS — v5 integrated layout
-# ═══════════════════════════════════════════════════════════════
+# ===================================================================
+#  ART PANEL RENDERERS
+# ===================================================================
 
 def render_panel_0():
-    """City skyline with gates — chapter opener."""
+    """World establishment -- Void Holes over city."""
     img = load_art("panel 0.jpg")
     if img is None:
         img = dark_panel(2400, (15, 5, 30))
     draw = ImageDraw.Draw(img)
-    w, h = img.size
-
-    font_sm = _font(38)
-    font_md = _font(46)
-    font_sm2 = _font(36)
-
-    top_lines = [
-        "Ten years ago Gates started cracking open in cities",
-        "like cheap motel doors.",
-    ]
-    y = int(h * 0.06)
-    for line in top_lines:
-        tw, th = _text_size(line, font_sm)
-        x = (w - tw) // 2
-        draw_shadow_text(draw, x, y, line, font_sm)
-        y += th + 14
-
-    mid_lines = [
-        "Monsters came flooding out.",
-        "People awakened with powers and became Hunters.",
-    ]
-    y = int(h * 0.42)
-    for line in mid_lines:
-        tw, th = _text_size(line, font_md)
-        x = (w - tw) // 2
-        draw_shadow_text(draw, x, y, line, font_md)
-        y += th + 16
-
-    bot_lines = [
-        "This ain't a story about one of those big-time Hunters.",
-        "It's about me -- an E-rank who did things his own way.",
-    ]
-    y = int(h * 0.82)
-    for line in bot_lines:
-        tw, th = _text_size(line, font_sm2)
-        x = (w - tw) // 2
-        draw_shadow_text(draw, x, y, line, font_sm2)
-        y += th + 14
-
+    draw_narration_boxes(draw, [
+        "Ten years ago Void Holes started opening.",
+        "Creatures came out.",
+        "People with abilities became Anoms.",
+    ], 40, int(img.height * 0.06))
     return img
 
 
 def render_panel_1():
-    """Character intro — Hollow's face."""
-    img = load_art("panel 1.jpg")
+    """Civilian behavior -- street level, nobody cares."""
+    img = load_art("Panel 1.jpg")
     if img is None:
         img = dark_panel()
     draw = ImageDraw.Draw(img)
     w, h = img.size
 
-    boxes = [
-        "My name is Hollow Zounds.",
-        "Yeah. That's my real government name.",
-        "My mama named me that back in '07",
-        "and ain't nobody in the family could pronounce it right.",
-    ]
-    draw_narration_boxes(draw, boxes, 40, int(h * 0.58))
+    font_sm = _font(34)
+    font_lg = _font(38)
+    draw_shadow_text(draw, 80, int(h * 0.52), '"Another one."', font_sm)
+    draw_shadow_text(draw, 320, int(h * 0.60), '"Third this week."', font_sm)
 
-    draw_floating_lines(draw, ["I still rock it like it's normal."],
-                        int(h * 0.88), font_size=48)
+    text = '"You want mustard or not?"'
+    tw, _ = _text_size(text, font_lg)
+    draw_shadow_text(draw, w - tw - 50, int(h * 0.74), text, font_lg)
     return img
 
 
-def render_panel_2():
-    """Gym scene — swordsmanship."""
-    img = load_art("panel 2.jpg")
+def render_panel_2a():
+    """Void is dangerous -- shadow creatures."""
+    img = load_art("PANEL 2A.jpg")
     if img is None:
-        img = dark_panel()
+        img = dark_panel(2400, (8, 5, 15))
     draw = ImageDraw.Draw(img)
-    w, h = img.size
+    draw_narration_boxes(draw, ["Not everyone makes it out."],
+                         40, int(img.height * 0.88))
+    return img
 
-    boxes = [
-        "I'm 18. Just graduated.",
-        "I live with my grandma in the same apartment I grew up in.",
-        "I taught myself swordsmanship off YouTube.",
-        "My sensei quit after three months.",
-        "I kept showing up every Tuesday anyway.",
-    ]
-    draw_narration_boxes(draw, boxes, 40, int(h * 0.05))
 
-    float_lines = [
-        "He eventually moved to another state",
-        "and blocked my number.",
-    ]
-    draw_floating_lines(draw, float_lines, int(h * 0.85), font_size=44)
+def render_panel_2b():
+    """Anoms in action -- competent team clearing Void."""
+    img = load_art("panel 2b.jpg")
+    if img is None:
+        img = dark_panel(2400)
+    draw = ImageDraw.Draw(img)
+    draw_narration_boxes(draw, [
+        "Anoms run Voids for a living.",
+        "Good ones make serious money.",
+    ], 40, int(img.height * 0.04))
     return img
 
 
 def render_panel_3():
-    """Phone screen — programmer brag."""
+    """Character intro -- Hollow portrait."""
     img = load_art("panel 3.jpg")
     if img is None:
         img = dark_panel()
     draw = ImageDraw.Draw(img)
     w, h = img.size
 
-    boxes_top = [
-        "I'm also a programmer.",
-        "Built my own hunter stat tracker app",
-        "on my cracked phone in my grandma's kitchen.",
-        "It's advanced as hell.",
-    ]
-    draw_narration_boxes(draw, boxes_top, 40, int(h * 0.04))
+    draw_narration_boxes(draw, [
+        "My name is Hollow Zounds.",
+        "E-rank. Basically a regular person with paperwork.",
+    ], 40, int(h * 0.62))
 
-    draw_floating_lines(draw,
-                        ["Some dude left a review that said",
-                         "'UI is straight ass.'"],
-                        int(h * 0.48), font_size=36)
-
-    draw_narration_boxes(draw,
-                         ["I replied at 2am: 'It kicks ass tho, my guy.'"],
-                         40, int(h * 0.66))
-
-    draw_floating_lines(draw, ["He ain't say nothing back."],
-                        int(h * 0.86), font_size=38)
+    stat_font = _font(22)
+    stat_color = (255, 255, 255, 90)
+    draw.text((w - 180, h - 80), "RANK: E", font=stat_font, fill=stat_color)
+    draw.text((w - 180, h - 52), "LUCK: ???", font=stat_font, fill=stat_color)
     return img
 
 
 def render_panel_4():
-    """Stat screen — luck stat."""
-    img = load_art("panel 4.png")
+    """Stakes -- bills on table, Anom card."""
+    img = load_art("panel 4.jpg")
     if img is None:
         img = dark_panel()
     draw = ImageDraw.Draw(img)
-    w, h = img.size
-
-    boxes = [
-        "Oh right. The luck stat.",
-        "After the incident the System gave me my stat screen.",
-        "Everything else was normal.",
-        "But Luck came back ERROR.",
-        "Warning said: DO NOT ALLOCATE.",
-    ]
-    draw_narration_boxes(draw, boxes, 40, int(h * 0.04))
-
-    float_lines = [
-        "I put the point in anyway.",
-        "I'm tryna get lucky out here.",
-        "You already know what I mean.",
-        "Been maxing that stat ever since.",
-    ]
-    draw_floating_lines(draw, float_lines, int(h * 0.72), font_size=42)
+    draw_narration_boxes(draw, [
+        "I awakened three months ago.",
+        "Haven't been approved for a contract yet.",
+        "Haven't run a single Void.",
+    ], 40, int(img.height * 0.04))
     return img
 
 
-def render_panel_5():
-    """Agent scanner scene."""
-    img = load_art("panel 5.jpg")
-    if img is None:
-        img = dark_panel()
-    draw = ImageDraw.Draw(img)
-    w, h = img.size
-
-    boxes = [
-        "Every scanner I walk past starts glitching and smoking.",
-        "Three agents filed official reports on government letterhead",
-        'about "severe equipment malfunction."',
-        "They eventually pulled me in for questioning.",
-    ]
-    draw_narration_boxes(draw, boxes, 40, int(h * 0.04))
-
-    draw_floating_lines(draw,
-                        ["This high-ranking dude looked at me and asked:"],
-                        int(h * 0.42), font_size=36)
-
-    draw_floating_lines(draw,
-                        ['"What did you do to your Luck stat?"'],
-                        int(h * 0.50), font_size=42)
-
-    float_lines = [
-        "I just shrugged and said:",
-        '"I live with my grandma, bro."',
-    ]
-    draw_floating_lines(draw, float_lines, int(h * 0.64), font_size=44)
-
-    draw_floating_lines(draw, ["He ain't say nothing back."],
-                        int(h * 0.82), font_size=36)
-
-    draw_floating_lines(draw, ["I respect that."],
-                        int(h * 0.90), font_size=40)
-    return img
-
-
-def render_panel_6():
-    """Gate opening — the big one."""
-    img = load_art("panel 6.jpg")
+def render_panel_6a():
+    """Void Hole opening -- narration overlay on baked-text art."""
+    img = load_art("panel 6a.jpg")
     if img is None:
         img = dark_panel(2400)
     draw = ImageDraw.Draw(img)
-    w, h = img.size
+    h = img.height
 
-    boxes_top = [
-        "Three weeks after graduation",
-        "I stopped at the 7-Eleven on the way home from practice.",
-        "Bought a sandwich and some chips. Minding my business.",
-    ]
-    draw_narration_boxes(draw, boxes_top, 40, int(h * 0.04))
+    draw_narration_boxes(draw, [
+        "Three weeks after graduation.",
+        "Stopped at the 7-Eleven on the way home from practice.",
+    ], 40, int(h * 0.02))
 
-    boxes_bot = [
-        "Then a whole Gate cracked open right on my block.",
-    ]
-    draw_narration_boxes(draw, boxes_bot, 40, int(h * 0.72))
-
-    float_lines = [
-        "Like somebody forgot to close",
-        "the refrigerator door",
+    draw_floating_lines(draw, [
+        "Like somebody forgot to close the refrigerator door",
         "to another dimension.",
-    ]
-    draw_floating_lines(draw, float_lines, int(h * 0.84), font_size=44)
+    ], int(h * 0.86), font_size=38)
+    return img
+
+
+def render_panel_6b():
+    """Apex arrives -- Hollow + agents before pull-in."""
+    img = load_art("panel 6b.jpg")
+    if img is None:
+        img = dark_panel(2400)
+    draw = ImageDraw.Draw(img)
+    h = img.height
+
+    draw_narration_boxes(draw, [
+        "Faction response team showed up two minutes later.",
+        "Then the Void Hole pulled us all in.",
+    ], 40, int(h * 0.04))
     return img
 
 
 def render_panel_7():
-    """Walking out of gate aftermath."""
-    img = dark_panel(1600, (12, 10, 22))
+    """Silent -- battle scene inside Void. No text."""
+    img = load_art("panel 7a.jpg")
+    if img is None:
+        img = dark_panel(2400, (12, 10, 22))
+    return img
+
+
+def render_panel_7b():
+    """Boss kill -- spider queen climax."""
+    img = load_art("panel 7b.jpg")
+    if img is None:
+        img = dark_panel(2400, (12, 10, 22))
     draw = ImageDraw.Draw(img)
-    w, h = img.size
+    draw_narration_boxes(draw, [
+        "The other two didn't make it to the boss room.",
+    ], 40, int(img.height * 0.04), font_size=32)
+    return img
 
-    boxes = [
-        "Three B-rank hunters got sucked in with me.",
-        "Two of them didn't make it.",
-        "I walked out with a monster core,",
-        "an empty sandwich wrapper,",
-        "and a level-up notification.",
-    ]
-    draw_narration_boxes(draw, boxes, 40, int(h * 0.08))
 
-    draw_floating_lines(draw,
-                        ["Obviously put the point in Luck."],
-                        int(h * 0.75), font_size=52)
+def render_panel_7c():
+    """Hero status notification -- text baked into art."""
+    img = load_art("panel 7c.jpg")
+    if img is None:
+        img = dark_panel()
+    return img
+
+
+def render_panel_7d():
+    """Hollow with sword and core -- accepted Hero Status."""
+    img = load_art("panel 7d.jpg")
+    if img is None:
+        img = dark_panel()
+    draw = ImageDraw.Draw(img)
+    draw_narration_boxes(draw, ["Obviously said yes."],
+                         40, int(img.height * 0.04))
+    return img
+
+
+def render_panel_7e():
+    """Inventory discovery -- items dissolving."""
+    img = load_art("panel 7e.jpg")
+    if img is None:
+        img = dark_panel()
+    draw = ImageDraw.Draw(img)
+    h = img.height
+
+    draw_narration_boxes(draw, [
+        "Then my stuff disappeared into thin air.",
+    ], 40, int(h * 0.04))
+
+    draw_floating_lines(draw, ['"I respected that."'],
+                        int(h * 0.88), font_size=46)
     return img
 
 
 def render_panel_8():
-    """Waiting room — Darius callback."""
+    """Aftermath -- walking out of Void. Glitch text in art."""
     img = load_art("panel 8.jpg")
     if img is None:
         img = dark_panel()
     draw = ImageDraw.Draw(img)
-    w, h = img.size
-
-    boxes = [
-        "Darius -- the only survivor --",
-        "still won't look me in the eye.",
-        "We've been called in for questioning three times.",
-        "Three times in that same waiting room.",
-    ]
-    draw_narration_boxes(draw, boxes, 40, int(h * 0.04))
-
-    float_lines = [
-        "I respect it.",
-        "He saw some things in there.",
-    ]
-    draw_floating_lines(draw, float_lines, int(h * 0.84), font_size=44)
+    draw_narration_boxes(draw, [
+        "Two Anoms didn't make it out.",
+        "The gate closed when the boss went down.",
+        "I walked out with an empty sandwich wrapper",
+        "and a notification I didn't understand.",
+    ], 40, int(img.height * 0.04))
     return img
 
 
 def render_panel_9():
-    """News aftermath."""
+    """World reacts -- news aftermath."""
     img = load_art("panel 9.jpg")
     if img is None:
         img = dark_panel()
     draw = ImageDraw.Draw(img)
-    w, h = img.size
+    h = img.height
 
-    boxes = [
+    draw_narration_boxes(draw, [
         "By midnight my name was everywhere.",
-        "Hunter forums blowing up.",
-        "News sites posted my blurry picture.",
-        "Twelve guild masters got the same notification",
-        "at the same time.",
-    ]
-    draw_narration_boxes(draw, boxes, 40, int(h * 0.04))
+        "Three factions. Same notification. Same time.",
+        "Nobody knew who I was.",
+    ], 40, int(h * 0.04))
 
-    draw_floating_lines(draw,
-                        ["Nobody knew who I was."],
-                        int(h * 0.78), font_size=50)
-
-    draw_floating_lines(draw,
-                        ["They were about to make it weird."],
-                        int(h * 0.90), font_size=38)
+    draw_floating_lines(draw, ["They were about to find out."],
+                        int(h * 0.88), font_size=46)
     return img
 
 
 def render_panel_10():
-    """Cinematic closer — no text."""
+    """Silent closer -- no text."""
     img = load_art("panel 10.jpg")
     if img is None:
         img = dark_panel()
@@ -401,7 +363,7 @@ def render_panel_10():
 
 
 def render_panel_11():
-    """Title card — black bg."""
+    """Title card."""
     img = load_art("panel 11.png")
     if img is not None:
         return img
@@ -429,65 +391,214 @@ def render_panel_11():
     return img
 
 
+# ===================================================================
+#  CURSOR-GENERATED DESIGN PANELS
+# ===================================================================
+
+def render_panel_7_i():
+    """Black panel -- agent deaths. Quiet. Respectful."""
+    w, h = TARGET_W, 600
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 255))
+    draw = ImageDraw.Draw(img)
+
+    line1 = "Two agents didn't make it to the boss room."
+    line2 = "They knew the risk."
+
+    f1 = _font(52)
+    f2 = _font(36)
+    tw1, th1 = _text_size(line1, f1)
+    tw2, th2 = _text_size(line2, f2)
+
+    total_block = th1 + 50 + 2 + 30 + th2
+    y_start = (h - total_block) // 2
+
+    draw.text(((w - tw1) // 2, y_start), line1, font=f1, fill=WHITE)
+
+    line_y = y_start + th1 + 50
+    line_w = max(tw1, tw2) + 40
+    draw.line([(w - line_w) // 2, line_y, (w + line_w) // 2, line_y],
+              fill=(255, 255, 255, 80), width=1)
+
+    draw.text(((w - tw2) // 2, line_y + 30), line2, font=f2,
+              fill=(136, 136, 136))
+    return img
+
+
+def render_panel_7_ii():
+    """Red BANG panel -- explosive transition."""
+    w, h = TARGET_W, 800
+    img = radial_gradient(w, h, (255, 0, 0), CRIMSON)
+    draw = ImageDraw.Draw(img)
+
+    cx, cy = w // 2, h // 2
+    for i in range(6):
+        r = 180 + i * 55
+        alpha = int(140 * (1 - i / 6))
+        draw.ellipse([(cx - r, cy - r), (cx + r, cy + r)],
+                     outline=(255, 255, 255, alpha), width=2)
+
+    font = _font(280)
+    text = "BANG"
+    tw, th = _text_size(text, font)
+    tx, ty = (w - tw) // 2, (h - th) // 2
+
+    for dx, dy in [(4, 4), (6, 6), (8, 8)]:
+        draw.text((tx + dx, ty + dy), text, font=font, fill=(0, 0, 0, 180))
+    draw.text((tx, ty), text, font=font, fill=WHITE)
+    return img
+
+
+def render_panel_7_iii():
+    """Sound effects panel -- chain reaction."""
+    w, h = TARGET_W, 900
+    img = Image.new("RGBA", (w, h), (*DARK_PURPLE, 255))
+    draw = ImageDraw.Draw(img)
+
+    f1 = _font(96)
+    t1 = "CRAAACK"
+    tw1, _ = _text_size(t1, f1)
+    draw_outlined_text(draw, (w - tw1) // 2 - 80, 90,
+                       t1, f1, fill=(192, 192, 192), outline_w=3)
+
+    f2 = _font(140)
+    t2 = "SKKRRRRCH"
+    tw2, th2 = _text_size(t2, f2)
+    pad = 50
+    txt_canvas = Image.new("RGBA", (tw2 + pad * 2, th2 + pad * 2), (0, 0, 0, 0))
+    txt_draw = ImageDraw.Draw(txt_canvas)
+    for dx in range(-3, 4):
+        for dy in range(-3, 4):
+            txt_draw.text((pad + dx, pad + dy), t2, font=f2,
+                          fill=(139, 0, 0, 200))
+    txt_draw.text((pad, pad), t2, font=f2, fill=WHITE)
+    rotated = txt_canvas.rotate(3, expand=True, resample=Image.BICUBIC)
+    img.paste(rotated, ((w - rotated.width) // 2, (h - rotated.height) // 2 - 20), rotated)
+
+    draw = ImageDraw.Draw(img)
+
+    f3 = _font(88)
+    t3 = "KSSSSREEEEEE"
+    tw3, th3 = _text_size(t3, f3)
+    draw_outlined_text(draw, (w - tw3) // 2 + 60, h - th3 - 100,
+                       t3, f3, fill=(*CRIMSON, 255), outline_w=3)
+    return img
+
+
+def render_panel_7_iv():
+    """White fade -- dark SFX to bright boss kill."""
+    return linear_gradient(TARGET_W, 300, DARK_PURPLE, (255, 255, 255))
+
+
+def render_panel_7_v():
+    """Portal exit fade -- white to black."""
+    return linear_gradient(TARGET_W, 300, (255, 255, 255), (0, 0, 0))
+
+
+def render_panel_7_vi():
+    """Narration panel -- item value + FINAL NOTICE callback."""
+    w, h = TARGET_W, 700
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 255))
+    draw = ImageDraw.Draw(img)
+
+    box_x = (w - int(w * 0.8)) // 2
+    box_h = draw_narration_boxes(draw, [
+        "The core was still in my inventory.",
+        "So was the sword.",
+        "No idea what either was worth.",
+    ], box_x, 80, gap=12, max_w=int(w * 0.8))
+
+    punch_y = 80 + box_h + 60
+    draw_floating_lines(draw, [
+        "But I had a FINAL NOTICE on my kitchen table.",
+        "So.",
+    ], punch_y, font_size=48)
+    return img
+
+
+def render_panel_7_vii():
+    """Night sky fade -- black to dark purple-blue."""
+    return linear_gradient(TARGET_W, 400, (0, 0, 0), DARK_PURPLE)
+
+
+# ===================================================================
+#  PANEL ORDER -- 24 panels
+# ===================================================================
+
 PANEL_RENDERERS = [
-    render_panel_0,
-    render_panel_1,
-    render_panel_2,
-    render_panel_3,
-    render_panel_4,
-    render_panel_5,
-    render_panel_6,
-    render_panel_7,
-    render_panel_8,
-    render_panel_9,
-    render_panel_10,
-    render_panel_11,
+    render_panel_0,        # 0  - World establishment
+    render_panel_1,        # 1  - Civilian behavior
+    render_panel_2a,       # 2  - Void is dangerous
+    render_panel_2b,       # 3  - Anoms in action
+    render_panel_3,        # 4  - Character intro
+    render_panel_4,        # 5  - Stakes / bills
+    render_panel_6a,       # 6  - Void Hole opening (narration + baked text)
+    render_panel_6b,       # 7  - Apex arrives
+    render_panel_7,        # 8  - Silent battle scene
+    render_panel_7_i,      # 9  - Black death panel (CURSOR)
+    render_panel_7_ii,     # 10 - Red BANG (CURSOR)
+    render_panel_7_iii,    # 11 - SFX chain reaction (CURSOR)
+    render_panel_7_iv,     # 12 - White fade (CURSOR)
+    render_panel_7b,       # 13 - Boss kill
+    render_panel_7c,       # 14 - Hero notification (silent)
+    render_panel_7d,       # 15 - Sword + core
+    render_panel_7e,       # 16 - Inventory discovery
+    render_panel_7_v,      # 17 - Portal exit fade (CURSOR)
+    render_panel_7_vi,     # 18 - Narration / FINAL NOTICE (CURSOR)
+    render_panel_7_vii,    # 19 - Night sky fade (CURSOR)
+    render_panel_8,        # 20 - Aftermath
+    render_panel_9,        # 21 - World reacts
+    render_panel_10,       # 22 - Silent closer
+    render_panel_11,       # 23 - Title card
 ]
 
 
-def blend_edge(top_img, bot_img, fade_h=FADE_H):
-    """Create a gradient blend between the bottom of top_img and top of bot_img."""
+# ===================================================================
+#  ASSEMBLY
+# ===================================================================
+
+def blend_edge(top_img, bot_img, fade_h):
     top_arr = np.array(top_img.convert("RGB"))
     bot_arr = np.array(bot_img.convert("RGB"))
-
     top_strip = top_arr[-fade_h:]
     bot_strip = bot_arr[:fade_h]
-
     blended = np.zeros_like(top_strip, dtype=np.float32)
     for row in range(fade_h):
         t = row / fade_h
-        t = t * t * (3 - 2 * t)  # smoothstep
+        t = t * t * (3 - 2 * t)
         blended[row] = top_strip[row] * (1 - t) + bot_strip[row] * t
-
     return Image.fromarray(blended.astype(np.uint8)).convert("RGBA")
 
 
 def assemble():
-    print("[*] Rendering v5 integrated panels...")
+    print("[*] Rendering v6.3 panels (24 total)...")
     panels = []
     for i, renderer in enumerate(PANEL_RENDERERS):
-        print(f"  Panel {i}: ", end="")
+        name = renderer.__name__.replace("render_", "")
+        print(f"  [{i:2d}] {name}: ", end="")
         img = renderer()
         panels.append(img)
         print(f"{img.width}x{img.height}")
 
-    print(f"\n[*] Assembling with {FADE_H}px blend transitions...")
+    fades = []
+    for i in range(len(panels) - 1):
+        f = min(FADE_H, panels[i].height // 3, panels[i + 1].height // 3)
+        fades.append(f)
+
+    print(f"\n[*] Assembling {len(panels)} panels with adaptive blend transitions...")
 
     segments = []
     for i, panel in enumerate(panels):
-        if i == 0:
-            top_crop = panel.crop((0, 0, panel.width, panel.height - FADE_H))
-            segments.append(top_crop)
-        else:
-            prev = panels[i - 1]
-            blend = blend_edge(prev, panel, FADE_H)
-            segments.append(blend)
+        bot_fade = fades[i] if i < len(fades) else 0
+        top_fade = fades[i - 1] if i > 0 else 0
 
-            is_last = (i == len(panels) - 1)
-            if is_last:
-                cropped = panel.crop((0, FADE_H, panel.width, panel.height))
-            else:
-                cropped = panel.crop((0, FADE_H, panel.width, panel.height - FADE_H))
+        if i == 0:
+            cropped = panel.crop((0, 0, panel.width, panel.height - bot_fade))
+            segments.append(cropped)
+        else:
+            blend = blend_edge(panels[i - 1], panel, top_fade)
+            segments.append(blend)
+            bottom_cut = bot_fade if i < len(panels) - 1 else 0
+            cropped = panel.crop((0, top_fade, panel.width, panel.height - bottom_cut))
             segments.append(cropped)
 
     total_h = sum(s.height for s in segments)
